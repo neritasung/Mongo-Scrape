@@ -1,0 +1,24 @@
+.nav{
+    margin-top: 1%;
+    font-size: 20px;
+} 
+.nav-link{
+    color: black
+}  
+
+#wrapper {
+    width: 960px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-top: 3%;
+  }
+  #articles {
+    display: inline-block;
+    overflow: auto;
+    width: 60%;
+    height: 700px;
+  }
+  #notes {
+    float: right;
+    width: 30%;
+  }
