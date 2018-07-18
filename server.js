@@ -1,5 +1,6 @@
 var express = require("express");
 var bodyParser = require("body-parser");
+var logger = require("morgan");
 var mongoose = require("mongoose");
 
 // Our scraping tools
@@ -11,13 +12,15 @@ var cheerio = require("cheerio");
 // Require all models
 var db = require("./models");
 
-var PORT = 3000;
+var PORT = 8080;
 
 // Initialize Express
 var app = express();
 
 // Configure middleware
 
+// Use morgan logger for logging requests
+app.use(logger("dev"));
 // Use body-parser for handling form submissions
 app.use(bodyParser.urlencoded({ extended: true }));
 // Use express.static to serve the public folder as a static directory
@@ -35,16 +38,17 @@ app.get("/scrape", function (req, res) {
         // Then, we load that into cheerio and save it to $ for a shorthand selector
         var $ = cheerio.load(response.data);
 
-        // Grabbing every h3 tag
-        $("h3").each(function (i, element) {
+        // Grabbing every h3 tag for title and link
+        $("div.mp-text").each(function (i, element) {
             // Save an empty result object
             var result = {};
 
             // Add the text, description and href of every link, and save them as properties of the result object
-            result.title = $(this)
-                .text();
-            result.link = $(this)
-                .attr("href");
+            result.title = $(element).children("h3").children("a").text();
+            result.link = $(element).children("h3").children("a").attr("href");
+            result.description = $(element).children("p").children("span").text();
+            console.log("result title: " + result.title);
+            console.log("result URL: " + result.link);
 
             // Create a new Article using the `result` object built from scraping
             db.Article.create(result)
