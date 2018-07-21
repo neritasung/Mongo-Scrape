@@ -16,5 +16,5 @@ TECHNOLOGIES USED:
 - mogran NPM Package
 - mongoose NPM Package
 - cheerio NPM Package
-
-LINK TO HEROKU: 
+s
+LINK TO HEROKU: https://stormy-river-53378.herokuapp.com/
