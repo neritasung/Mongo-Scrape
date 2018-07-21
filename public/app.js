@@ -3,7 +3,7 @@ $.getJSON("/articles", function (data) {
   for (var i = 0; i < data.length; i++) {
     // Display the apropos information on the page
     $("#articles").append(
-      "<div class='col-sm-12' style='margin-bottom:60px;'><div class='card'><div class='card-body'><a class='title-link' href='" + data[i].link +"'><h5>" + data[i].title + "</h5></a><hr><p class='card-text'>" + data[i].description + "</p><button data-id='" + data[i]._id + "' class='btn-note btn btn-outline-primary btn-sm' data-toggle='modal' data-target='#myModal' style='margin-right:10px;'>Note</button><button id='btn-save' data-id='" + data[i]._id + "' class='btn btn-outline-primary btn-sm'>Save Article</button></div></div></div>");
+      "<div class='col-sm-12' style='margin-bottom:60px;'><div class='card'><div class='card-body'><a class='title-link' href='" + data[i].link + "'><h5>" + data[i].title + "</h5></a><hr><p class='card-text'>" + data[i].description + "</p><button data-id='" + data[i]._id + "' class='btn-note btn btn-outline-primary btn-sm' style='margin-right:10px;'>Note</button><button id='btn-save' data-id='" + data[i]._id + "' class='btn btn-outline-primary btn-sm'>Save Article</button></div></div></div>");
   }
   console.log(data);
 });
@@ -76,4 +76,20 @@ $(document).on("click", "#savenote", function () {
   // Also, remove the values entered in the input and textarea for note entry
   $("#titleinput").val("");
   $("#bodyinput").val("");
+});
+
+// When you click the Save Article button
+$(document).on("click", "#btn-save", function () {
+  $(this).addClass("disabled");
+  var thisId = $(this).attr("data-id");
+  console.log(thisId);
+
+  $.ajax({
+    method: "PUT",
+    url: "/saved/" + thisId,
+  })
+
+    .then(function (data) {
+      console.log(data);
+    });
 });
