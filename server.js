@@ -38,17 +38,22 @@ app.get("/scrape", function (req, res) {
         // Then, we load that into cheerio and save it to $ for a shorthand selector
         var $ = cheerio.load(response.data);
 
-        // Grabbing every h3 tag for title and link
+        // Grabbing data for title, description and link
         $("div.mp-text").each(function (i, element) {
-            // Save an empty result object
-            var result = {};
+    
+        // Add the text, description and href of every link, and save them as properties of the result object
+            var title = $(element).children("h3").children("a").text();
+            var link = $(element).children("h3").children("a").attr("href");
+            var description = $(element).children("p").children("span").text();
 
-            // Add the text, description and href of every link, and save them as properties of the result object
-            result.title = $(element).children("h3").children("a").text();
-            result.link = $(element).children("h3").children("a").attr("href");
-            result.description = $(element).children("p").children("span").text();
-            console.log("result title: " + result.title);
-            console.log("result URL: " + result.link);
+            // creat result object
+            var result = {
+                title:title,
+                link:link,
+                description:description,
+                isSaved: false
+            }
+            console.log(result);
 
             // Create a new Article using the `result` object built from scraping
             db.Article.create(result)
@@ -69,7 +74,6 @@ app.get("/scrape", function (req, res) {
 
 // Route for getting all Articles from the db
 app.get("/articles", function (req, res) {
-    // TODO: Finish the route so it grabs all of the articles
     db.Article.find({})
         .then(function (dbArticle) {
             res.json(dbArticle);
@@ -110,6 +114,46 @@ app.post("/articles/:id", function (req, res) {
             res.json(err)
         })
 });
+
+// Route for saving/updating article to be saved
+app.put("/save/:id", function(req, res) {
+
+    db.Article
+      .findByIdAndUpdate({ _id: req.params.id }, { $set: { isSaved: true }})
+      .then(function(dbArticle) {
+        res.json(dbArticle);
+      })
+      .catch(function(err) {
+        res.json(err);
+      });
+  });
+  
+  // Route for getting saved article
+  app.get("/save", function(req, res) {
+  
+    db.Article
+      .find({ isSaved: true })
+      .then(function(dbArticle) {
+        res.json(dbArticle);
+      })
+      .catch(function(err) {
+        res.json(err);
+      });
+  });
+  
+  // Route for deleting/updating saved article
+  app.put("/delete/:id", function(req, res) {
+  
+    db.Article
+      .findByIdAndUpdate({ _id: req.params.id }, { $set: { isSaved: false }})
+      .then(function(dbArticle) {
+        res.json(dbArticle);
+      })
+      .catch(function(err) {
+        res.json(err);
+      });
+  });
+
 
 // Start the server
 app.listen(PORT, function () {
